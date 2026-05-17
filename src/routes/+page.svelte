@@ -603,6 +603,17 @@
                     {/if}
                 {/each}
             </div>
+            <svg
+                class="star"
+                bind:this={heroStar}
+                viewBox="0 0 24 24"
+                fill="var(--color-brand)"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                />
+            </svg>
         </div>
     </div>
 
@@ -613,17 +624,6 @@
             class="hero-image"
             bind:this={heroImage}
         />
-        <svg
-            class="star"
-            bind:this={heroStar}
-            viewBox="0 0 24 24"
-            fill="var(--color-brand)"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path
-                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-            />
-        </svg>
     </div>
 </section>
 
@@ -1829,13 +1829,15 @@
             display: none;
         }
         .star {
-            top: 55%;
-            left: 50%;
-            margin-left: -75px;
-            margin-top: -75px;
+            position: relative;
+            top: auto;
+            left: auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 4rem;
             z-index: 10;
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
         }
         .hero-image-wrapper {
             right: -25%;
@@ -1848,7 +1850,7 @@
         }
         .hero-content {
             z-index: 5;
-            margin-top: -40vh;
+            margin-top: -15vh;
         }
 
         .marquee {

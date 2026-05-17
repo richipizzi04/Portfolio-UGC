@@ -968,8 +968,7 @@
             <div class="ig-data-grid">
                 <div class="ig-col">
                     <div class="data-item">
-                        <span class="data-label">Account Raggiunti (35.4K)</span
-                        >
+                        <span class="data-label">Account Raggiunti (35K)</span>
                         <span
                             class="data-value num-animate"
                             data-target="976"
@@ -989,7 +988,7 @@
                         <span class="data-label">Visite al profilo</span>
                         <span
                             class="data-value num-animate"
-                            data-target="93.9"
+                            data-target="94"
                             data-prefix="+"
                             data-suffix="%">+0%</span
                         >
@@ -1799,6 +1798,22 @@
 
     /* === RESPONSIVE MOBILE CSS === */
     @media (max-width: 768px) {
+        .intro-text {
+            position: absolute;
+            font-family: var(--font-sans);
+            font-weight: 600;
+
+            /* Aumentato: minimo 1.8rem (circa 28px) e massimo 4.5rem (circa 72px) */
+            font-size: clamp(1.8rem, 5vw, 4.5rem);
+
+            color: var(--color-white, #ffffff);
+            text-align: center;
+            opacity: 0;
+            padding: var(--size-4);
+            max-width: 95vw;
+            width: 100%;
+            letter-spacing: -0.02em; /* Un valore leggermente più negativo rende il testo grande più compatto ed elegante */
+        }
         .hero {
             margin-bottom: -8vh;
         }
@@ -2074,6 +2089,23 @@
                 2.5rem
             ); /* Rimpicciolisce i numeri grandi (es. +976%, 113.7K) */
             letter-spacing: -1px; /* Adegua lo spazio tra i numeri per la nuova dimensione */
+        }
+
+        /* === Rimpicciolisce le scritte in bold (etichette dei dati) === */
+        .data-label {
+            font-size: 0.74rem; /* Riduce le scritte sopra i numeri blu (es. Account Raggiunti) */
+            font-weight: 700; /* Mantiene l'aspetto bold ma più compatto */
+        }
+
+        /* === Rimpicciolisce i titoli dei blocchi (Instagram... / TikTok...) === */
+        .insight-block h3 {
+            font-size: 1.1rem; /* Riduce i titoli delle due sezioni */
+            margin-bottom: 1rem; /* Regola di conseguenza lo spazio sotto il titolo */
+        }
+
+        /* Sistema anche la label interna alla ciambella se serve */
+        .donut-label {
+            font-size: 0.75rem; /* Rimpicciolisce la scritta "Non-Follower" */
         }
 
         .label-city {

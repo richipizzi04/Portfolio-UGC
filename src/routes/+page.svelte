@@ -1241,7 +1241,8 @@
         width: clamp(40px, 6vw, 90px);
         height: clamp(40px, 6vw, 90px);
         top: 36%;
-        left: -10%;
+        left: auto;
+        right: -5vw;
         transform: rotate(-15deg);
         transform-origin: center center;
     }

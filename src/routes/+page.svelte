@@ -1823,14 +1823,16 @@
             align-items: center;
             gap: 1rem;
             margin-top: 8vh;
-            font-size: 2rem;
+            font-size: 1.2rem;
         }
         .hero-tags .dash {
             display: none;
         }
         .star {
             top: 55%;
-            left: 43%;
+            left: 50%;
+            margin-left: -75px;
+            margin-top: -75px;
             z-index: 10;
             width: 150px;
             height: 150px;

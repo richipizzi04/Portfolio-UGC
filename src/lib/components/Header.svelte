@@ -66,22 +66,20 @@
     /* ========================================= */
     @media (max-width: 768px) {
         header {
-            padding-top: 4rem;
+            padding-top: 1.5rem;
             flex-direction: column;
-            gap: 1rem; /* Gap ridotto per compattarecite: */
+            gap: 0.5rem;
             text-align: center;
         }
 
-        /* --- NUOVA MODIFICA: Ingrandire "RICCARDO PIZZIGONI" solo su Mobile --- */
         .logo {
-            font-size: 1.8rem; /* Imposta una dimensione maggiore specifica per mobilecite: */
+            font-size: 1.4rem;
         }
 
         nav {
             justify-content: center;
             width: 100%;
-            /* --- NUOVA MODIFICA: Ingrandire "UGC" e "CONTENT CREATOR" solo su Mobile --- */
-            font-size: 1.2rem; /* Aumentato (era 0.9rem) per renderli più grandicite: */
+            font-size: 0.9rem;
         }
     }
 </style>

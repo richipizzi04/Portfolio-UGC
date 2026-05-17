@@ -1833,6 +1833,7 @@
             position: relative;
             top: auto;
             left: auto;
+            right: auto;
             margin-left: auto;
             margin-right: auto;
             margin-top: 4rem;

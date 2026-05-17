@@ -709,7 +709,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/fromboxtoart.mp4"
+                            src="/videos/fromboxtoart.mp4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"
@@ -732,7 +732,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/howitchanges.mp4"
+                            src="/videos/howitchanges.mp4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"
@@ -754,7 +754,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/vangogh.MP4"
+                            src="/videos/vangogh.MP4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"
@@ -798,7 +798,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/PALAZZO LITTA.mp4"
+                            src="/videos/PALAZZO LITTA.mp4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"
@@ -821,7 +821,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/QCxETHIMO.mp4"
+                            src="/videos/QCxETHIMO.mp4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"
@@ -843,7 +843,7 @@
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
                         <video
-                            src="/videos/GUCCI.mp4"
+                            src="/videos/GUCCI.mp4#t=0.1"
                             loop
                             playsinline
                             class="mockup-video"

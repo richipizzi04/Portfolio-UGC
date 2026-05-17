@@ -860,7 +860,7 @@
                 </div>
             </div>
             <div class="project-info">
-                <h3>MILANO DESIGN WEEK 2026<br />IDNNT x DDN</h3>
+                <h3>MILANO DESIGN WEEK 2026<br />IDNTT x DDN</h3>
                 <ul>
                     <li>
                         Realizzare contenuti in showroom, installazioni per

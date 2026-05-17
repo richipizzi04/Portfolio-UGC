@@ -73,7 +73,7 @@
         }
 
         .logo {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
         }
 
         nav {

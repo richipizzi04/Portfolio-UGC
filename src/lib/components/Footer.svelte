@@ -170,7 +170,15 @@
         transform: rotate(15deg);
     }
 
+    /* === STILI DESKTOP (Schermi larghi) === */
     @media (min-width: 768px) {
+        footer {
+            padding-top: 3rem;
+            padding-bottom: 2rem;
+
+            /* Queste annullano la classe .safe-area su mobile */
+            padding-left: 1.5rem !important;
+        }
         .links-container {
             flex-direction: row;
             justify-content: space-between;
@@ -195,6 +203,49 @@
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    /* === STILI MOBILE (Schermi piccoli) === */
+    @media (max-width: 768px) {
+        footer {
+            padding-top: 3rem; /* Riduce lo spazio vuoto sopra */
+            padding-bottom: 2rem;
+        }
+
+        .footer-title {
+            font-size: 1.5rem; /* Rimpicciolisce il titolo principale */
+            margin-bottom: 2rem;
+            line-height: 1.3;
+        }
+
+        .footer-bottom {
+            gap: 2rem; /* Riduce la distanza tra i link e i credits in basso */
+        }
+
+        .links-container {
+            gap: 1rem;
+        }
+
+        .footer-link {
+            padding-bottom: 1rem;
+            gap: 1rem; /* Avvicina l'etichetta (es. EMAIL) al testo effettivo */
+        }
+
+        .link-label {
+            width: 80px; /* Riduce lo spazio occupato dall'etichetta per far respirare i testi lunghi */
+            font-size: 0.8rem;
+        }
+
+        .link-text {
+            font-size: 1rem; /* Rimpicciolisce l'email e gli handle dei social */
+            /* word-break: break-word; Opzionale: decommenta se l'email sfora ancora su schermi minuscoli */
+        }
+
+        .footer-credits {
+            font-size: 0.8rem; /* Rimpicciolisce il copyright e il pulsante Torna su */
+            gap: 0.8rem;
+            padding-top: 1rem;
         }
     }
 </style>

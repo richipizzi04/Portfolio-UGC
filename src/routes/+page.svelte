@@ -1085,9 +1085,12 @@
 {/if}
 
 <style>
+    :global(html),
     :global(body) {
-        overflow-x: hidden;
-        width: 100%;
+        overflow-x: hidden !important;
+        width: 100vw; /* Usa 100vw invece di 100% per maggiore sicurezza */
+        max-width: 100%;
+        position: relative;
     }
 
     .intro-screen {
@@ -1736,8 +1739,9 @@
     }
 
     .tk-data-grid {
-        display: flex;
-        gap: var(--size-10);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--size-6); /* Usa lo stesso gap di ig-data-grid */
     }
 
     .data-item {
@@ -1806,7 +1810,7 @@
         }
         .hero h1 {
             margin-left: 0;
-            padding-top: 0vh;
+            padding-top: 10vh;
             align-items: center;
         }
         .word-creator {
@@ -1842,7 +1846,7 @@
             height: 120px;
         }
         .hero-image-wrapper {
-            right: -25%;
+            right: -5%;
             bottom: -5vh;
             height: 85vh;
             z-index: 0;
@@ -1886,10 +1890,10 @@
             aspect-ratio: 1;
         }
         .bg-star {
-            width: 120%;
-            height: 120%;
-            left: -6%;
-            top: +30%;
+            width: 140%;
+            height: 140%;
+            left: -20%;
+            top: +50%;
         }
         .about-title-inside {
             margin-top: -13vh; /* Meno negativo = più spazio sopra su mobile */
@@ -1902,15 +1906,17 @@
         }
         .neulis-rest {
             padding-top: 2vh;
+            font-size: 1.6rem;
         }
 
         .about-right {
-            margin-top: -15vh;
-            padding-inline: 1rem;
+            margin-top: -13vh;
+            padding-inline: 0rem;
             z-index: 10;
+            gap: 1rem; /* Aumenta lo spazio tra i paragrafi */
         }
         .description p {
-            font-size: 1.15rem;
+            font-size: 0.7rem;
             text-align: center;
             line-height: 1.6;
         }
@@ -1924,6 +1930,21 @@
         }
 
         /* === Collaborazioni: Telefoni separati e proporzionati === */
+        .letter-collab {
+            font-size: clamp(
+                4rem,
+                15vw,
+                6rem
+            ); /* Rimpicciolisce la "C" corsiva */
+        }
+
+        .word-rest-collab {
+            font-size: clamp(
+                1.5rem,
+                7vw,
+                2.5rem
+            ); /* Rimpicciolisce "ollaborazioni" per farlo stare nello schermo */
+        }
         .project-slide {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1961,6 +1982,10 @@
             border-radius: 10px;
         }
 
+        .collaborations {
+            padding-bottom: 2rem;
+        }
+
         /* Pulsanti laterali del telefono usando CSS */
         .phone-mockup::before {
             content: "";
@@ -1987,40 +2012,107 @@
             display: none;
         }
 
-        .project-info {
-            width: 100%;
-            text-align: left;
-            position: relative;
-            top: auto;
-            align-self: center; /* Abbassa la descrizione centrandola verticalmente rispetto al telefono */
-        }
-
         .project-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            padding-top: 2rem;
+            font-size: 0.95rem; /* Rimpicciolito il titolo LENOVO */
+            margin-bottom: 0.3rem; /* Avvicinato alla lista */
         }
 
         .project-info ul {
             align-items: flex-start;
             text-align: left;
+            /* AGGIUNGI QUESTA RIGA: annulla lo spazio gigante tra un punto e l'altro */
+            gap: 0.4rem;
         }
 
         .project-info li {
-            font-size: 0.8rem;
-            padding-left: 1rem;
-            margin-bottom: 0.3rem;
+            font-size: 0.6rem; /* Rimpicciolito il testo dei punti elenco */
+            padding-left: 0.8rem; /* Avvicinato il pallino al testo */
+            margin-bottom: 0;
+            line-height: 1.2; /* Compatta le righe quando un punto va a capo */
+        }
+
+        .collab-vertical-list {
+            gap: 4rem;
         }
 
         /* Insights Tweak */
         .insights-grid {
             grid-template-columns: 1fr;
+            margin-left: -1.5rem;
         }
         .ig-data-grid {
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 3.3rem;
         }
         .ig-col-right {
             margin-top: 0;
+        }
+
+        /* === Rimpicciolisce il titolo "Social Insights" su Mobile === */
+        .letter-script-insights {
+            font-size: clamp(
+                5rem,
+                12vw,
+                8rem
+            ); /* Rimpicciolisce la S e la I maiuscole */
+        }
+
+        .word-rest-insights {
+            font-size: clamp(
+                1.5rem,
+                6vw,
+                2rem
+            ); /* Rimpicciolisce "ocial" e "nsights" */
+        }
+
+        /* === Rimpicciolisce i numeri blu degli Insights su Mobile === */
+        .data-value {
+            font-size: clamp(
+                1.8rem,
+                8vw,
+                2.5rem
+            ); /* Rimpicciolisce i numeri grandi (es. +976%, 113.7K) */
+            letter-spacing: -1px; /* Adegua lo spazio tra i numeri per la nuova dimensione */
+        }
+
+        .label-city {
+            font-size: clamp(
+                1.4rem,
+                6vw,
+                1.8rem
+            ); /* Rimpicciolisce la parola "Milano" */
+        }
+
+        .text-small {
+            font-size: clamp(
+                1rem,
+                4vw,
+                1.2rem
+            ); /* Rimpicciolisce le percentuali tra parentesi (es. 7.5%) */
+        }
+
+        .donut-label .num-animate {
+            font-size: clamp(
+                1.2rem,
+                5vw,
+                1.5rem
+            ); /* Rimpicciolisce il numero nel grafico a ciambella */
+        }
+
+        /* === Riduce lo spazio sotto il titolo "Social Insights" === */
+        .insights-title {
+            margin-bottom: 2rem; /* Abbassa questo valore (es. 1.5rem) se lo vuoi ancora più vicino */
+        }
+
+        /* Opzionale: se vuoi ridurre anche lo spazio sotto "Instagram Analytics" prima dei dati */
+        .insight-block h3 {
+            margin-bottom: 1.5rem;
+        }
+
+        /* === Riduce lo spazio tra il blocco Instagram e TikTok === */
+        .insights-grid {
+            gap: 3rem; /* Cambia a 1.5rem se lo vuoi ancora più vicino */
         }
     }
 

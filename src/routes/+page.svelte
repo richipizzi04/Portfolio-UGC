@@ -7,6 +7,7 @@
     let isModalOpen = $state(false);
     let currentVideoSrc = $state("");
 
+    /** @param {string} src */
     function openModal(src) {
         currentVideoSrc = src;
         isModalOpen = true;
@@ -19,12 +20,16 @@
         document.body.style.overflow = ""; // Sblocca lo scroll
     }
 
+    /**
+     * @param {Event} e
+     * @param {string} src
+     */
     function handleVideoClick(e, src) {
         if (window.innerWidth <= 768) {
             openModal(src);
         } else {
             // Comportamento Desktop: play/pause inline
-            const phone = e.currentTarget;
+            const phone = /** @type {HTMLElement} */ (e.currentTarget);
             const video = phone.querySelector("video");
             const overlay = phone.querySelector(".play-overlay");
             if (video) {
@@ -38,21 +43,58 @@
             }
         }
     }
+
+    /**
+     * @param {KeyboardEvent} e
+     * @param {string} src
+     */
+    function handleVideoKeydown(e, src) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleVideoClick(e, src);
+        }
+    }
+
+    /** @param {Event} e */
+    function toggleReason(e) {
+        /** @type {HTMLElement} */ (e.currentTarget).classList.toggle(
+            "is-open",
+        );
+    }
+
+    /** @param {KeyboardEvent} e */
+    function toggleReasonKeydown(e) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleReason(e);
+        }
+    }
     /* ----------------------------- */
 
     /* In futuro qui importeremo i video dalla cartella static/videos */
 
+    /** @type {HTMLDivElement} */
     let introScreen;
+    /** @type {HTMLDivElement} */
     let introText1;
+    /** @type {HTMLDivElement} */
     let introText2;
 
+    /** @type {HTMLElement} */
     let letterV;
+    /** @type {HTMLElement} */
     let letterC;
+    /** @type {HTMLElement} */
     let wordRest1;
+    /** @type {HTMLElement} */
     let wordRest2;
+    /** @type {HTMLImageElement} */
     let heroImage;
+    /** @type {SVGSVGElement} */
     let heroStar;
+    /** @type {HTMLElement[]} */
     let tagElements = [];
+    /** @type {HTMLElement[]} */
     let dashes = [];
 
     const tags = ["DESIGN", "FASHION", "LIFESTYLE", "ART"];
@@ -283,7 +325,9 @@
         const mmPhones = gsap.matchMedia();
 
         gsap.utils.toArray(".project-slide").forEach((slide) => {
-            const phones = slide.querySelectorAll(".phone-mockup");
+            const phones = /** @type {NodeListOf<HTMLElement>} */ (
+                slide.querySelectorAll(".phone-mockup")
+            );
 
             // Impostiamo una posizione sfalsata e ruotata a "ventaglio" solo su Desktop
             mmPhones.add("(min-width: 769px)", () => {
@@ -487,6 +531,7 @@
         });
 
         // --- ANIMAZIONE STELLA CHE VIAGGIA E SEZIONE ROSSA CON MATCHMEDIA ---
+        /** @type {gsap.core.Timeline} */
         let journeyTl;
         const createStarAnim = () => {
             if (journeyTl) journeyTl.kill();
@@ -703,8 +748,12 @@
             <div class="phones-group">
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) =>
                         handleVideoClick(e, "/videos/fromboxtoart.mp4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/fromboxtoart.mp4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -713,7 +762,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -726,8 +776,12 @@
                 </div>
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) =>
                         handleVideoClick(e, "/videos/howitchanges.mp4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/howitchanges.mp4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -736,7 +790,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -749,7 +804,11 @@
                 </div>
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) => handleVideoClick(e, "/videos/vangogh.MP4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/vangogh.MP4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -758,7 +817,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -792,8 +852,12 @@
             <div class="phones-group">
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) =>
                         handleVideoClick(e, "/videos/PALAZZO LITTA.mp4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/PALAZZO LITTA.mp4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -802,7 +866,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -815,8 +880,12 @@
                 </div>
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) =>
                         handleVideoClick(e, "/videos/QCxETHIMO.mp4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/QCxETHIMO.mp4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -825,7 +894,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -838,7 +908,11 @@
                 </div>
                 <div
                     class="phone-mockup"
+                    role="button"
+                    tabindex="0"
                     onclick={(e) => handleVideoClick(e, "/videos/GUCCI.mp4")}
+                    onkeydown={(e) =>
+                        handleVideoKeydown(e, "/videos/GUCCI.mp4")}
                 >
                     <div class="phone-notch"></div>
                     <div class="phone-screen">
@@ -847,7 +921,8 @@
                             loop
                             playsinline
                             class="mockup-video"
-                        ></video>
+                        >
+                            <track kind="captions" /></video>
                         <div class="play-overlay">
                             <svg
                                 viewBox="0 0 24 24"
@@ -897,7 +972,10 @@
         <div class="reasons-list">
             <div
                 class="reason"
-                onclick={(e) => e.currentTarget.classList.toggle("is-open")}
+                role="button"
+                tabindex="0"
+                onclick={toggleReason}
+                onkeydown={toggleReasonKeydown}
             >
                 <h3>DESIGN STRATEGICO</h3>
                 <div class="reason-content">
@@ -910,7 +988,10 @@
             </div>
             <div
                 class="reason"
-                onclick={(e) => e.currentTarget.classList.toggle("is-open")}
+                role="button"
+                tabindex="0"
+                onclick={toggleReason}
+                onkeydown={toggleReasonKeydown}
             >
                 <h3>ESTETICA PREMIUM</h3>
                 <div class="reason-content">
@@ -923,7 +1004,10 @@
             </div>
             <div
                 class="reason"
-                onclick={(e) => e.currentTarget.classList.toggle("is-open")}
+                role="button"
+                tabindex="0"
+                onclick={toggleReason}
+                onkeydown={toggleReasonKeydown}
             >
                 <h3>AFFIDABILITÀ E PROFESSIONALITÀ</h3>
                 <div class="reason-content">
@@ -936,7 +1020,10 @@
             </div>
             <div
                 class="reason"
-                onclick={(e) => e.currentTarget.classList.toggle("is-open")}
+                role="button"
+                tabindex="0"
+                onclick={toggleReason}
+                onkeydown={toggleReasonKeydown}
             >
                 <h3>STORYTELLING DINAMICO</h3>
                 <div class="reason-content">
@@ -1068,7 +1155,15 @@
     </div>
 </section>
 
+<svelte:window
+    onkeydown={(e) => {
+        if (isModalOpen && e.key === "Escape") closeModal();
+    }}
+/>
+
 {#if isModalOpen}
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="video-modal" onclick={closeModal}>
         <button class="close-btn" onclick={closeModal}>✕</button>
         <video
@@ -1079,10 +1174,12 @@
             class="fullscreen-video"
             onclick={(e) => e.stopPropagation()}
         >
+            <track kind="captions" />
         </video>
     </div>
 {/if}
 
+<!-- svelte-ignore css_unused_selector -->
 <style>
     :global(html),
     :global(body) {
@@ -1126,12 +1223,6 @@
     .about {
         padding-top: 0;
         padding-bottom: 0;
-    }
-
-    .section-title {
-        font-size: clamp(3rem, 6vw, 6rem);
-        color: var(--color-brand);
-        margin-bottom: var(--size-6);
     }
 
     .hero {

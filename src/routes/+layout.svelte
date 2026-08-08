@@ -18,6 +18,10 @@
     <link rel="stylesheet" href="https://use.typekit.net/cmj3ghn.css">
 
     <link href="https://db.onlinewebfonts.com/c/92649d5606272c17cb8021b160c2460e?family=Edwardian+Script+ITC+Regular" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </svelte:head>
 
 <Header />

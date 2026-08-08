@@ -12,6 +12,8 @@
     /* Typography */
     --font-sans: "Neulis Sans", sans-serif;
     --font-script: "Edwardian Script ITC Regular", cursive;
+    --font-display: "Syne", sans-serif;
+    --font-body: "Inter", sans-serif;
 
     /* Spacing & Sizes Scale */
     --size-1: 0.25rem;

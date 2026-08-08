@@ -1,4 +1,4 @@
-<footer class="safe-area bg-brand">
+<footer class="safe-area bg-brand" id="contatti">
     <div class="footer-content">
         <h2 class="footer-title">
             HAI VISTO COSA SO FARE.<br />
@@ -17,7 +17,12 @@
                     class="footer-link"
                 >
                     <span class="link-label">INSTAGRAM</span>
-                    <span class="link-text">@richi_pizzi</span>
+                    <span class="link-text-group">
+                        <span class="link-text">@richi_pizzi</span>
+                        <span class="link-followers"
+                            >Follower: da collegare alle API</span
+                        >
+                    </span>
                 </a>
                 <a
                     href="https://tiktok.com/@richipizzi"
@@ -25,7 +30,12 @@
                     class="footer-link"
                 >
                     <span class="link-label">TIKTOK</span>
-                    <span class="link-text">@richipizzi</span>
+                    <span class="link-text-group">
+                        <span class="link-text">@richipizzi</span>
+                        <span class="link-followers"
+                            >Follower: da collegare alle API</span
+                        >
+                    </span>
                 </a>
             </div>
 
@@ -129,10 +139,25 @@
         letter-spacing: 1px;
     }
 
+    .link-text-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
     .link-text {
         font-family: var(--font-sans);
         font-size: clamp(1.2rem, 2vw, 2rem);
         font-weight: 500;
+    }
+
+    .link-followers {
+        font-family: var(--font-display, var(--font-sans));
+        font-style: italic;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.65);
+        letter-spacing: 0.01em;
     }
 
     .footer-credits {
@@ -240,6 +265,10 @@
         .link-text {
             font-size: 1rem; /* Rimpicciolisce l'email e gli handle dei social */
             /* word-break: break-word; Opzionale: decommenta se l'email sfora ancora su schermi minuscoli */
+        }
+
+        .link-followers {
+            font-size: 0.75rem;
         }
 
         .footer-credits {

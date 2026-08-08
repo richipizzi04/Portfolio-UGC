@@ -5,9 +5,9 @@
         class="logo">RICCARDO PIZZIGONI</a
     >
     <nav>
-        <a href="#ugc" class="nav-link">UGC</a>
+        <a href="#portfolio" class="nav-link">PORTFOLIO</a>
         <span class="separator">|</span>
-        <a href="#content-creator" class="nav-link">CONTENT CREATOR</a>
+        <a href="#contatti" class="nav-link">CONTATTI</a>
     </nav>
 </header>
 

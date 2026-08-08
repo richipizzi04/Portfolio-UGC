@@ -20,41 +20,6 @@
         document.body.style.overflow = ""; // Sblocca lo scroll
     }
 
-    /**
-     * @param {Event} e
-     * @param {string} src
-     */
-    function handleVideoClick(e, src) {
-        if (window.innerWidth <= 768) {
-            openModal(src);
-        } else {
-            // Comportamento Desktop: play/pause inline
-            const phone = /** @type {HTMLElement} */ (e.currentTarget);
-            const video = phone.querySelector("video");
-            const overlay = phone.querySelector(".play-overlay");
-            if (video) {
-                if (video.paused) {
-                    video.play();
-                    if (overlay) overlay.classList.add("is-playing");
-                } else {
-                    video.pause();
-                    if (overlay) overlay.classList.remove("is-playing");
-                }
-            }
-        }
-    }
-
-    /**
-     * @param {KeyboardEvent} e
-     * @param {string} src
-     */
-    function handleVideoKeydown(e, src) {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleVideoClick(e, src);
-        }
-    }
-
     /** @param {Event} e */
     function toggleReason(e) {
         /** @type {HTMLElement} */ (e.currentTarget).classList.toggle(
@@ -71,7 +36,126 @@
     }
     /* ----------------------------- */
 
-    /* In futuro qui importeremo i video dalla cartella static/videos */
+    /* --- HERO: REEL VIDEO DI SFONDO --- */
+    const heroReel = [
+        "/videos/QCxETHIMO.mp4",
+        "/videos/fromboxtoart.mp4",
+        "/videos/PALAZZO LITTA.mp4",
+        "/videos/vangogh.MP4",
+        "/videos/howitchanges.mp4",
+        "/videos/GUCCI.mp4",
+    ];
+    let heroReelIndex = 0;
+
+    /** @type {HTMLVideoElement} */
+    let heroVideoEl;
+
+    function handleHeroVideoEnded() {
+        heroReelIndex = (heroReelIndex + 1) % heroReel.length;
+        if (heroVideoEl) {
+            heroVideoEl.src = heroReel[heroReelIndex];
+            heroVideoEl.play();
+        }
+    }
+    /* ----------------------------- */
+
+    /* --- SOCIAL PROOF: LOGHI BRAND --- */
+    const brandLogos = [
+        "LENOVO",
+        "MONOPOLY GO!",
+        "IL TUO BRAND",
+        "HOSPITALITY PARTNER",
+    ];
+    /* ----------------------------- */
+
+    /* --- PORTFOLIO: DATI E FILTRI --- */
+    const portfolioFilters = [
+        "Tutti",
+        "Tech",
+        "Lifestyle",
+        "Gaming",
+        "Unboxing",
+        "Voiceover",
+    ];
+
+    const portfolioItems = [
+        {
+            src: "/videos/fromboxtoart.mp4",
+            client: "Lenovo",
+            category: "Tech",
+            metric: "",
+        },
+        {
+            src: "/videos/howitchanges.mp4",
+            client: "Lenovo",
+            category: "Tech",
+            metric: "",
+        },
+        {
+            src: "/videos/vangogh.MP4",
+            client: "Lenovo",
+            category: "Tech",
+            metric: "",
+        },
+        {
+            src: "/videos/PALAZZO LITTA.mp4",
+            client: "IDNTT x DDN",
+            category: "Lifestyle",
+            metric: "",
+        },
+        {
+            src: "/videos/QCxETHIMO.mp4",
+            client: "IDNTT x DDN",
+            category: "Lifestyle",
+            metric: "",
+        },
+        {
+            src: "/videos/GUCCI.mp4",
+            client: "Fashion",
+            category: "Lifestyle",
+            metric: "",
+        },
+    ];
+
+    let activeFilter = $state("Tutti");
+
+    let filteredPortfolio = $derived(
+        activeFilter === "Tutti"
+            ? portfolioItems
+            : portfolioItems.filter((item) => item.category === activeFilter),
+    );
+
+    /** @param {Event} e */
+    function handleCardEnter(e) {
+        const video = /** @type {HTMLElement} */ (
+            e.currentTarget
+        ).querySelector("video");
+        if (video) video.play();
+    }
+
+    /** @param {Event} e */
+    function handleCardLeave(e) {
+        const video = /** @type {HTMLVideoElement} */ (
+            /** @type {HTMLElement} */ (e.currentTarget).querySelector(
+                "video",
+            )
+        );
+        if (video) {
+            video.pause();
+            video.currentTime = 0;
+        }
+    }
+
+    /** @param {KeyboardEvent} e
+     *  @param {string} src
+     */
+    function handlePortfolioKeydown(e, src) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openModal(src);
+        }
+    }
+    /* ----------------------------- */
 
     /** @type {HTMLDivElement} */
     let introScreen;
@@ -81,31 +165,37 @@
     let introText2;
 
     /** @type {HTMLElement} */
-    let letterV;
+    let heroLine1;
     /** @type {HTMLElement} */
-    let letterC;
+    let heroLine2;
     /** @type {HTMLElement} */
-    let wordRest1;
+    let heroSubcopy;
     /** @type {HTMLElement} */
-    let wordRest2;
+    let heroCta;
     /** @type {HTMLImageElement} */
-    let heroImage;
-    /** @type {SVGSVGElement} */
-    let heroStar;
+    let heroPhotoEl;
+
+    const tags = ["DESIGN", "FASHION", "LIFESTYLE", "ART"];
     /** @type {HTMLElement[]} */
     let tagElements = [];
     /** @type {HTMLElement[]} */
     let dashes = [];
 
-    const tags = ["DESIGN", "FASHION", "LIFESTYLE", "ART"];
-
     onMount(() => {
         gsap.registerPlugin(ScrollTrigger);
         const tl = gsap.timeline();
 
-        gsap.set([".marquee", ".about", ".collaborations", ".reasons"], {
-            autoAlpha: 0,
-        });
+        gsap.set(
+            [
+                ".marquee",
+                ".about",
+                ".social-proof",
+                ".portfolio-section",
+                ".artist-section",
+                ".reasons",
+            ],
+            { autoAlpha: 0 },
+        );
 
         window.scrollTo(0, 0);
         setTimeout(() => window.scrollTo(0, 0), 10);
@@ -170,57 +260,40 @@
                 "-=0.1",
             );
 
-        // --- SEQUENZA HOMEPAGE ---
+        // --- SEQUENZA HERO ---
         tl.fromTo(
-            [letterV, letterC],
-            { clipPath: "inset(-100% 100% -100% -100%)", opacity: 0 },
-            {
-                clipPath: "inset(-100% -100% -100% -100%)",
-                opacity: 1,
-                duration: 1.2,
-                ease: "power2.inOut",
-                stagger: 0.2,
-                clearProps: "clipPath",
-            },
+            heroPhotoEl,
+            { opacity: 0, x: 60 },
+            { opacity: 1, x: 0, duration: 1.2, ease: "power3.out" },
             "-=0.2",
         );
 
         tl.fromTo(
-            [wordRest1, wordRest2],
-            { opacity: 0, x: -20, filter: "blur(5px)" },
+            heroLine1,
+            { opacity: 0, filter: "blur(12px)", y: 30 },
             {
                 opacity: 1,
-                x: 0,
                 filter: "blur(0px)",
-                duration: 0.8,
+                y: 0,
+                duration: 1,
                 ease: "power3.out",
-                stagger: 0.2,
-                clearProps: "filter",
             },
             "-=1.0",
         );
 
         tl.fromTo(
-            heroImage,
-            { opacity: 0, x: 300 },
-            { opacity: 1, x: 0, duration: 1, ease: "power3.out" },
-            "-=0.4",
-        );
-
-        tl.fromTo(
-            heroStar,
-            { opacity: 0, scale: 0, rotate: -90 },
+            heroLine2,
+            { opacity: 0, filter: "blur(12px)", y: 20 },
             {
                 opacity: 1,
-                scale: 1,
-                rotate: 0,
-                duration: 0.8,
-                ease: "elastic.out(1, 0.6)",
+                filter: "blur(0px)",
+                y: 0,
+                duration: 0.9,
+                ease: "power3.out",
             },
-            "-=0.5",
+            "-=0.7",
         );
 
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%&";
         tl.fromTo(
             dashes,
             { opacity: 0, scale: 0 },
@@ -231,9 +304,10 @@
                 stagger: 0.1,
                 ease: "back.out(2)",
             },
-            "-=0.2",
+            "-=0.3",
         );
 
+        const scrambleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%&";
         tagElements.forEach((el, index) => {
             const finalWord = tags[index];
             const dummyObj = { value: 0 };
@@ -256,9 +330,10 @@
                             .map((char, i) =>
                                 i < progress
                                     ? finalWord[i]
-                                    : letters[
+                                    : scrambleLetters[
                                           Math.floor(
-                                              Math.random() * letters.length,
+                                              Math.random() *
+                                                  scrambleLetters.length,
                                           )
                                       ],
                             )
@@ -269,6 +344,20 @@
             );
         });
 
+        tl.fromTo(
+            heroSubcopy,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
+            "-=0.2",
+        );
+
+        tl.fromTo(
+            heroCta,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" },
+            "-=0.4",
+        );
+
         tl.to(
             [".marquee", ".about"],
             {
@@ -276,12 +365,12 @@
                 duration: 1,
                 ease: "power2.out",
             },
-            "-=4",
+            "-=0.2",
         );
 
         // 2. Il resto del sito compare regolarmente
         tl.to(
-            [".collaborations", ".reasons"],
+            [".social-proof", ".portfolio-section", ".artist-section", ".reasons"],
             {
                 autoAlpha: 1,
                 duration: 1,
@@ -306,7 +395,7 @@
             ease: "power3.out",
             clearProps: "all",
         });
-        gsap.from(".about-right p", {
+        gsap.from(".about-right > *", {
             scrollTrigger: {
                 trigger: ".about",
                 start: "top 80%",
@@ -321,126 +410,61 @@
             clearProps: "all",
         });
 
-        // --- NUOVA ANIMAZIONE TELEFONI CHE COMPAIONO DA SOTTO ---
-        const mmPhones = gsap.matchMedia();
-
-        gsap.utils.toArray(".project-slide").forEach((slide) => {
-            const phones = /** @type {NodeListOf<HTMLElement>} */ (
-                slide.querySelectorAll(".phone-mockup")
-            );
-
-            // Impostiamo una posizione sfalsata e ruotata a "ventaglio" solo su Desktop
-            mmPhones.add("(min-width: 769px)", () => {
-                if (phones[0]) gsap.set(phones[0], { y: 15, rotation: -1.5 });
-                if (phones[1])
-                    gsap.set(phones[1], { y: -15, rotation: 0, zIndex: 2 });
-                if (phones[2]) gsap.set(phones[2], { y: 15, rotation: 1.5 });
-            });
-
-            // Su mobile azzeriamo per allinearli
-            mmPhones.add("(max-width: 768px)", () => {
-                phones.forEach((phone) =>
-                    gsap.set(phone, { y: 0, rotation: 0 }),
-                );
-            });
-
-            // I telefoni emergono dal basso
-            gsap.from(phones, {
-                scrollTrigger: {
-                    trigger: slide,
-                    start: "top 75%",
-                },
-                y: "+=250",
-                opacity: 0,
-                duration: 1.2,
-                stagger: 0.15,
-                ease: "back.out(1.2)",
-                onComplete: () => {
-                    // Floating animation continua
-                    phones.forEach((phone, i) => {
-                        gsap.to(phone, {
-                            y: i === 1 ? "-=15" : "+=15",
-                            rotation: i === 1 ? "+=2" : "-=2",
-                            duration: 2.5 + i * 0.2,
-                            yoyo: true,
-                            repeat: -1,
-                            ease: "sine.inOut",
-                        });
-                    });
-                },
-            });
-
-            // Hover interactions
-            phones.forEach((phone, i) => {
-                phone.addEventListener("mouseenter", () => {
-                    gsap.to(phone, {
-                        scale: 1.05,
-                        boxShadow:
-                            "0 0 0 2px #d1d1d1, 0 0 0 4px #a3a3a3, 15px 30px 50px rgba(0,0,0,0.3)",
-                        duration: 0.4,
-                        ease: "back.out(2)",
-                        overwrite: "auto",
-                    });
-                });
-                phone.addEventListener("mouseleave", () => {
-                    gsap.to(phone, {
-                        scale: 1,
-                        boxShadow:
-                            "0 0 0 2px #d1d1d1, 0 0 0 4px #a3a3a3, 10px 20px 40px rgba(0,0,0,0.15)",
-                        duration: 0.4,
-                        ease: "power2.out",
-                        overwrite: "auto",
-                    });
-                });
-
-                // NOTA: Il vecchio evento "click" per play/pause è stato rimosso per far funzionare il Modale Svelte.
-            });
-        });
-
-        // Animazione della stella principale "Collaborazioni"
-        gsap.from(".collab-main-star", {
+        // --- PARALLAX VIDEO HERO ---
+        gsap.to(".hero-video-bg", {
             scrollTrigger: {
-                trigger: ".collaborations",
-                start: "top 15%",
-                end: "top -45%",
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
                 scrub: 1,
             },
-            x: "100vw",
-            rotation: 720,
+            yPercent: 15,
+            scale: 1.15,
+            ease: "none",
+        });
+
+        // --- SOCIAL PROOF REVEAL ---
+        gsap.from(".social-proof-inner", {
+            scrollTrigger: { trigger: ".social-proof", start: "top 88%" },
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
             ease: "power2.out",
         });
 
-        // I testi compaiono in cascata quando la loro slide entra nello schermo
-        gsap.utils.toArray(".project-slide").forEach((slide) => {
-            const infoElements = slide.querySelectorAll(
-                ".project-info h3, .project-info li",
-            );
-            gsap.from(infoElements, {
-                scrollTrigger: {
-                    trigger: slide,
-                    start: "top 75%",
-                },
-                opacity: 0,
-                x: 30,
-                duration: 0.8,
-                stagger: 0.15,
-                ease: "power2.out",
-            });
+        // --- PORTFOLIO REVEAL ---
+        gsap.from(".portfolio-header", {
+            scrollTrigger: { trigger: ".portfolio-section", start: "top 80%" },
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out",
+        });
+        gsap.from(".portfolio-card", {
+            scrollTrigger: { trigger: ".portfolio-grid", start: "top 80%" },
+            y: 60,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+        });
 
-            // Aggiungiamo un sottile effetto parallax ai testi
-            const infoContainer = slide.querySelector(".project-info");
-            if (infoContainer) {
-                gsap.to(infoContainer, {
-                    scrollTrigger: {
-                        trigger: slide,
-                        start: "top 85%",
-                        end: "bottom 15%",
-                        scrub: 1,
-                    },
-                    y: -40,
-                    ease: "none",
-                });
-            }
+        // --- ARTIST SECTION REVEAL ---
+        gsap.from(".artist-copy > *", {
+            scrollTrigger: { trigger: ".artist-section", start: "top 70%" },
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power2.out",
+        });
+        gsap.from(".artist-panel", {
+            scrollTrigger: { trigger: ".artist-section", start: "top 65%" },
+            y: 40,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
         });
 
         gsap.from(".reasons .section-title-reasons", {
@@ -530,7 +554,7 @@
             });
         });
 
-        // --- ANIMAZIONE STELLA CHE VIAGGIA E SEZIONE ROSSA CON MATCHMEDIA ---
+        // --- ANIMAZIONE STELLA CHE VIAGGIA NELLA SEZIONE ABOUT (MATCHMEDIA) ---
         /** @type {gsap.core.Timeline} */
         let journeyTl;
         const createStarAnim = () => {
@@ -540,19 +564,6 @@
             // Creiamo il MatchMedia per differenziare le animazioni Mobile vs Desktop ---
             let mm = gsap.matchMedia();
 
-            // 1. La stella iniziale ruota semplicemente su se stessa
-            gsap.to(heroStar, {
-                scrollTrigger: {
-                    trigger: "body",
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 1,
-                },
-                rotation: 1440, // Aumentata la rotazione per fare molti più giri durante lo scroll
-                ease: "none",
-            });
-
-            // 2. La stella grande della sezione rossa ---
             // DESKTOP: entra da sinistra ed esce a destra con pin
             mm.add("(min-width: 769px)", () => {
                 gsap.set(".bg-star", {
@@ -583,7 +594,6 @@
 
             // MOBILE: sta ferma al centro e gira sul posto ---
             mm.add("(max-width: 768px)", () => {
-                // Lasciamo che sia il CSS a gestire la posizione!
                 gsap.set(".bg-star", {
                     x: 0,
                     opacity: 1,
@@ -592,7 +602,7 @@
 
                 journeyTl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: ".about", // Si attiva solo quando scendi sulla sezione About ---
+                        trigger: ".about",
                         start: "top bottom",
                         end: "bottom top",
                         scrub: 1,
@@ -600,7 +610,7 @@
                 });
 
                 journeyTl.to(".bg-star", {
-                    rotation: 360, // Gira solo sul posto ---
+                    rotation: 360,
                     ease: "none",
                 });
             });
@@ -620,55 +630,65 @@
     </div>
 </div>
 
-<section class="hero safe-area">
-    <div class="hero-content">
-        <div class="title-wrapper">
-            <h1 class="main-title">
-                <div class="word-line word-visual">
-                    <span class="font-script letter-script" bind:this={letterV}
-                        >V</span
-                    ><span class="word-rest" bind:this={wordRest1}>isual</span>
-                </div>
-                <div class="word-line word-creator">
-                    <span class="font-script letter-script" bind:this={letterC}
-                        >C</span
-                    ><span class="word-rest" bind:this={wordRest2}>reator</span>
-                </div>
-            </h1>
-            <div class="hero-tags">
-                {#each tags as tag, i}
-                    <span class="tag-container">
-                        <span class="tag-hidden">{tag}</span>
-                        <span class="tag-scramble" bind:this={tagElements[i]}
-                            >{tag}</span
-                        >
-                    </span>
-                    {#if i < tags.length - 1}
-                        <span class="dash" bind:this={dashes[i]}>-</span>
-                    {/if}
-                {/each}
-            </div>
-            <svg
-                class="star"
-                bind:this={heroStar}
-                viewBox="0 0 24 24"
-                fill="var(--color-brand)"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                />
-            </svg>
-        </div>
-    </div>
+<section class="hero">
+    <video
+        class="hero-video-bg"
+        bind:this={heroVideoEl}
+        src={heroReel[0]}
+        autoplay
+        muted
+        playsinline
+        onended={handleHeroVideoEnded}
+    >
+        <track kind="captions" />
+    </video>
+    <div class="hero-overlay"></div>
 
-    <div class="hero-image-wrapper">
+    <div class="hero-photo-wrap">
         <img
             src="/images/copertina.png"
             alt="Riccardo Pizzigoni"
-            class="hero-image"
-            bind:this={heroImage}
+            class="hero-photo"
+            bind:this={heroPhotoEl}
         />
+    </div>
+
+    <div class="hero-content safe-area">
+        <h1 class="hero-title" bind:this={heroLine1}>
+            <span class="hero-name-line">
+                <span class="font-script hero-script-letter">R</span
+                ><span class="hero-name-rest">iccardo</span>
+            </span>
+            <span class="hero-name-line hero-name-line-2">
+                <span class="font-script hero-script-letter">P</span
+                ><span class="hero-name-rest">izzigoni</span>
+            </span>
+        </h1>
+        <p class="hero-role" bind:this={heroLine2}>
+            UGC e Content Creator &amp; Visual Artist.
+        </p>
+        <div class="hero-tags">
+            {#each tags as tag, i}
+                <span class="tag-container">
+                    <span class="tag-hidden">{tag}</span>
+                    <span class="tag-scramble" bind:this={tagElements[i]}
+                        >{tag}</span
+                    >
+                </span>
+                {#if i < tags.length - 1}
+                    <span class="dash" bind:this={dashes[i]}>-</span>
+                {/if}
+            {/each}
+        </div>
+        <p class="hero-subcopy" bind:this={heroSubcopy}>
+            Trasformo idee in contenuti visivi ad alta conversione. Unisco
+            l'estetica del design alla forza dello storytelling per brand che
+            vogliono distinguersi.
+        </p>
+        <div class="hero-cta-row" bind:this={heroCta}>
+            <a href="#portfolio" class="btn btn-primary">Guarda i miei lavori</a>
+            <a href="#contatti" class="btn btn-secondary">Collaboriamo</a>
+        </div>
     </div>
 </section>
 
@@ -697,268 +717,168 @@
                         />
                     </svg>
                     <h2 class="about-title-inside">
-                        <span class="script-a">A</span>
-                        <span class="neulis-rest">bout<br />me</span>
+                        Più di un semplice<br />Creator.
                     </h2>
                 </div>
             </div>
 
-            <div class="description about-right">
-                <p>
-                    La differenza tra un buon lavoro e un lavoro eccezionale sta
-                    nei dettagli. Nei miei video fondo 2 anime: il rigore visivo
-                    del design e la freschezza dei social. Risultato? Contenuti
-                    autentici, curati al millimetro e guidati da uno
-                    storytelling ironico che sa catturare l’attenzione dal primo
-                    secondo.
+            <div class="about-right">
+                <p class="about-intro">
+                    Non mi limito a registrare video, costruisco mondi
+                    visivi. Il mio approccio unisce:
                 </p>
-                <p class="right-align">
-                    Il design non è solo estetica, è strategia.
-                </p>
-                <p>
-                    Come studente di Design della Comunicazione al Politecnico
-                    di Milano e Content Creator, non mi limito a registrare
-                    video: progetto messaggi visivi.
-                </p>
+
+                <div class="about-features">
+                    <div class="feature">
+                        <span class="feature-icon">🎥</span>
+                        <h3>Alta Qualità Visiva</h3>
+                        <p>
+                            Riprese, montaggio dinamico e color grading
+                            professionale per contenuti pronti per le
+                            campagne Ads.
+                        </p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">✏️</span>
+                        <h3>Precisione Artistica</h3>
+                        <p>
+                            Come artista iperrealista, curo la composizione,
+                            la luce e il dettaglio di ogni singola
+                            inquadratura.
+                        </p>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">💡</span>
+                        <h3>Design Thinking</h3>
+                        <p>
+                            Ogni contenuto è studiato strategicamente per il
+                            target di riferimento, garantendo non solo
+                            estetica, ma performance.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="about-photos">
+                    <img
+                        src="/images/copertina.png"
+                        alt="Riccardo Pizzigoni"
+                        class="about-photo"
+                    />
+                    <div class="photo-placeholder">
+                        <span>🎨 Sostituisci: mentre disegni</span>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 </div>
 
-<section class="collaborations safe-area">
-    <div class="collab-header">
-        <h2 class="collab-title">
-            <span class="font-script letter-collab">C</span><span
-                class="word-rest-collab">ollaborazioni</span
-            >
-            <svg
-                class="collab-main-star"
-                viewBox="0 0 24 24"
-                fill="var(--color-brand)"
-                xmlns="http://www.w3.org/2000/svg"
-                ><path
-                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                /></svg
-            >
-        </h2>
-    </div>
-
-    <div class="collab-vertical-list">
-        <div class="project-slide" id="ugc" style="scroll-margin-top: 100px;">
-            <div class="phones-group">
-                <div
-                    class="phone-mockup"
-                    role="button"
-                    tabindex="0"
-                    onclick={(e) =>
-                        handleVideoClick(e, "/videos/fromboxtoart.mp4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/fromboxtoart.mp4")}
-                >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/fromboxtoart.mp4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="phone-mockup"
-                    role="button"
-                    tabindex="0"
-                    onclick={(e) =>
-                        handleVideoClick(e, "/videos/howitchanges.mp4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/howitchanges.mp4")}
-                >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/howitchanges.mp4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="phone-mockup"
-                    role="button"
-                    tabindex="0"
-                    onclick={(e) => handleVideoClick(e, "/videos/vangogh.MP4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/vangogh.MP4")}
-                >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/vangogh.MP4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="project-info">
-                <h3>LENOVO</h3>
-                <ul>
-                    <li>Campagna Lancio Yoga Tab</li>
-                    <li>Obiettivo: mostrare le potenzialità del tablet</li>
-                    <li>
-                        Target: artisti, designer, studenti, tutti coloro che
-                        usano il tablet per lavorare, creare o studiare
-                    </li>
-                    <li>novembre 2025</li>
-                </ul>
+<section class="social-proof safe-area">
+    <div class="social-proof-inner">
+        <p class="social-proof-label">Brand con cui ho collaborato</p>
+        <div class="marquee-track-wrap">
+            <div class="marquee-track">
+                {#each [...brandLogos, ...brandLogos] as brand}
+                    <span class="brand-pill">{brand}</span>
+                {/each}
             </div>
         </div>
+    </div>
+</section>
 
-        <div
-            class="project-slide"
-            id="content-creator"
-            style="scroll-margin-top: 100px;"
-        >
-            <div class="phones-group">
+<section class="portfolio-section safe-area" id="portfolio">
+    <div class="portfolio-header">
+        <h2 class="section-title-portfolio">Portfolio</h2>
+        <p class="portfolio-subtitle">
+            Contenuti pensati per convertire, non solo per piacere.
+        </p>
+    </div>
+
+    <div class="portfolio-filters">
+        {#each portfolioFilters as filter}
+            <button
+                class="filter-chip"
+                class:active={activeFilter === filter}
+                onclick={() => (activeFilter = filter)}
+            >
+                {filter}
+            </button>
+        {/each}
+    </div>
+
+    {#if filteredPortfolio.length > 0}
+        <div class="portfolio-grid">
+            {#each filteredPortfolio as item (item.src)}
                 <div
-                    class="phone-mockup"
+                    class="portfolio-card"
                     role="button"
                     tabindex="0"
-                    onclick={(e) =>
-                        handleVideoClick(e, "/videos/PALAZZO LITTA.mp4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/PALAZZO LITTA.mp4")}
+                    onmouseenter={handleCardEnter}
+                    onmouseleave={handleCardLeave}
+                    onclick={() => openModal(item.src)}
+                    onkeydown={(e) => handlePortfolioKeydown(e, item.src)}
                 >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/PALAZZO LITTA.mp4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
+                    <video
+                        src={item.src + "#t=0.1"}
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata"
+                        class="portfolio-video"
+                    >
+                        <track kind="captions" />
+                    </video>
+                    {#if item.metric}
+                        <span class="portfolio-metric">{item.metric}</span>
+                    {/if}
+                    <div class="portfolio-caption">
+                        <span class="portfolio-client">{item.client}</span>
+                        <span class="portfolio-category">{item.category}</span>
                     </div>
                 </div>
-                <div
-                    class="phone-mockup"
-                    role="button"
-                    tabindex="0"
-                    onclick={(e) =>
-                        handleVideoClick(e, "/videos/QCxETHIMO.mp4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/QCxETHIMO.mp4")}
+            {/each}
+        </div>
+    {:else}
+        <div class="portfolio-empty">
+            <p>Nuovi contenuti in arrivo per questa categoria.</p>
+        </div>
+    {/if}
+</section>
+
+<section class="artist-section">
+    <div class="artist-inner safe-area">
+        <div class="artist-copy">
+            <h2 class="section-title-artist">L'estetica fa la differenza.</h2>
+            <p>
+                Il mio background nel disegno e nel 3D mi permette di
+                strutturare inquadrature, palette colori e storyboard con una
+                precisione maniacale. I brand non ottengono solo un volto, ma
+                una direzione artistica completa.
+            </p>
+        </div>
+        <div class="artist-visual">
+            <div class="artist-panel artist-panel-art">
+                <span
+                    >🖌️ Sostituisci: disegno iperrealista o render Blender</span
                 >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/QCxETHIMO.mp4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="phone-mockup"
-                    role="button"
-                    tabindex="0"
-                    onclick={(e) => handleVideoClick(e, "/videos/GUCCI.mp4")}
-                    onkeydown={(e) =>
-                        handleVideoKeydown(e, "/videos/GUCCI.mp4")}
-                >
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <video
-                            src="/videos/GUCCI.mp4#t=0.1"
-                            loop
-                            playsinline
-                            class="mockup-video"
-                        >
-                            <track kind="captions" /></video>
-                        <div class="play-overlay">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="white"
-                                width="48"
-                                height="48"><path d="M8 5v14l11-7z" /></svg
-                            >
-                        </div>
-                    </div>
-                </div>
             </div>
-            <div class="project-info">
-                <h3>MILANO DESIGN WEEK 2026<br />IDNTT x DDN</h3>
-                <ul>
-                    <li>
-                        Realizzare contenuti in showroom, installazioni per
-                        brand
-                    </li>
-                    <li>
-                        Obiettivo: aumentare la visibilità del mondo del design
-                    </li>
-                    <li>
-                        Target: ragazzi che non conoscono nulla di design ma che
-                        potrebbero essere interessati
-                    </li>
-                </ul>
+            <div class="artist-panel artist-panel-video">
+                <video
+                    src="/videos/vangogh.MP4#t=0.1"
+                    muted
+                    loop
+                    autoplay
+                    playsinline
+                >
+                    <track kind="captions" />
+                </video>
             </div>
         </div>
     </div>
 </section>
 
 <section class="reasons bg-brand safe-area">
-    <h2 class="section-title-reasons">
-        <span class="font-script letter-script-reasons">P</span>erché lavorare
-        con me <span class="font-script question-mark">?</span>
-    </h2>
+    <h2 class="section-title-reasons">Perché lavorare con me?</h2>
     <div class="reasons-container">
         <svg
             class="reasons-bg-star"
@@ -1039,15 +959,7 @@
 </section>
 
 <section class="insights safe-area">
-    <h2 class="insights-title">
-        <span class="font-script letter-script-insights">S</span><span
-            class="word-rest-insights">ocial</span
-        >
-        &nbsp;&nbsp;
-        <span class="font-script letter-script-insights">I</span><span
-            class="word-rest-insights">nsights</span
-        >
-    </h2>
+    <h2 class="insights-title">Social Insights</h2>
 
     <div class="insights-grid">
         <div class="insight-block">
@@ -1221,85 +1133,139 @@
         padding-block: var(--size-10);
     }
     .about {
-        padding-top: 0;
-        padding-bottom: 0;
+        padding-top: var(--size-9);
+        padding-bottom: var(--size-10);
     }
 
+    /* --- HERO --- */
     .hero {
         position: relative;
         z-index: 10;
-        min-height: 80vh;
+        min-height: 92vh;
         display: flex;
-        align-items: center;
-        overflow: visible;
+        align-items: flex-end;
+        overflow: hidden;
+        background-color: var(--color-white);
+    }
+
+    .hero-video-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        -webkit-mask-image: linear-gradient(
+            to top,
+            transparent 0%,
+            transparent 40%,
+            black 100%
+        );
+        mask-image: linear-gradient(
+            to top,
+            transparent 0%,
+            transparent 40%,
+            black 100%
+        );
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.2) 0%,
+            rgba(0, 0, 0, 0.05) 45%,
+            transparent 65%
+        );
+    }
+
+    .hero-photo-wrap {
+        position: absolute;
+        right: -2%;
+        bottom: -10%;
+        height: 115%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .hero-photo {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+        object-position: bottom right;
     }
 
     .hero-content {
         position: relative;
         z-index: 2;
-        margin-top: -5vh;
         width: 100%;
-    }
-
-    .title-wrapper {
-        display: inline-flex;
-        flex-direction: column;
-    }
-
-    .hero h1 {
+        padding-block: clamp(3rem, 8vw, 6rem) clamp(3rem, 6vw, 5rem);
+        color: var(--color-text);
         display: flex;
         flex-direction: column;
-        color: var(--color-brand);
-        margin: 0;
-        line-height: 0.8;
-        padding-top: 4vh;
-        margin-left: -3vw;
+        gap: var(--size-5);
     }
 
-    .word-line {
+    .hero-title {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        line-height: 0.85;
+        color: var(--color-brand);
+    }
+
+    .hero-name-line {
         display: flex;
         align-items: baseline;
     }
 
-    .word-creator {
-        margin-left: 6vw;
-        margin-top: -12vh;
+    .hero-name-line-2 {
+        margin-top: -0.08em;
     }
 
-    .letter-script {
-        font-size: clamp(8rem, 20vw, 22rem);
-        padding-right: 0vw;
-        position: relative;
-        z-index: 100;
-        display: inline-block;
+    .hero-script-letter {
+        font-size: clamp(4.5rem, 10vw, 8.5rem);
+        line-height: 0.7;
+        padding-right: 0.05em;
     }
 
-    .word-rest {
-        font-family: var(--font-sans);
-        font-size: clamp(1.2rem, 10vw, 11rem);
-        font-weight: 400;
-        margin-left: 1.5vw;
-        position: relative;
-        z-index: -1;
+    .hero-name-rest {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+        letter-spacing: -0.01em;
+    }
+
+    .hero-role {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: clamp(1.2rem, 2.6vw, 2.2rem);
+        color: var(--color-brand);
+        margin: 0;
     }
 
     .hero-tags {
         display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-top: var(--size-4);
-        font-size: clamp(0.9rem, 1.5vw, 1.5rem);
+        align-items: center;
+        gap: var(--size-4);
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: clamp(0.8rem, 1.3vw, 1.05rem);
         letter-spacing: 0.05em;
-        padding-left: 0vw;
+        color: var(--color-text);
     }
 
     .hero-tags .dash {
         opacity: 0.3;
     }
+
     .tag-container {
         position: relative;
         display: inline-block;
     }
+
     .tag-hidden {
         visibility: hidden;
     }
@@ -1313,31 +1279,59 @@
         white-space: nowrap;
     }
 
-    .hero-image-wrapper {
-        position: absolute;
-        right: -2%;
-        bottom: -35vh;
-        height: 145vh;
-        z-index: 1;
-        pointer-events: none;
+    .hero-subcopy {
+        font-family: var(--font-body);
+        font-size: clamp(1rem, 1.3vw, 1.25rem);
+        line-height: 1.6;
+        max-width: 56ch;
+        color: rgba(0, 0, 0, 0.65);
+        margin: 0;
     }
 
-    .hero-image {
-        height: 100%;
-        width: auto;
-        object-fit: contain;
-        object-position: bottom right;
+    .hero-cta-row {
+        display: flex;
+        gap: var(--size-4);
+        flex-wrap: wrap;
+        margin-top: var(--size-2);
     }
 
-    .star {
-        position: absolute;
-        width: clamp(40px, 6vw, 90px);
-        height: clamp(40px, 6vw, 90px);
-        top: 29%;
-        left: auto;
-        right: 46vw;
-        transform: rotate(-15deg);
-        transform-origin: center center;
+    .btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.9rem 1.8rem;
+        border-radius: 999px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            transform 0.3s var(--ease-out-quart),
+            background-color 0.3s ease,
+            border-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background: var(--color-brand);
+        color: var(--color-white);
+        border: 1px solid var(--color-brand);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        background: #3a63e8;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--color-brand);
+        border: 1px solid rgba(42, 83, 216, 0.4);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+        background: rgba(42, 83, 216, 0.08);
+        border-color: var(--color-brand);
     }
 
     .marquee {
@@ -1368,7 +1362,6 @@
         gap: var(--size-4);
         align-items: center;
         overflow: visible;
-        margin-top: -8vh;
     }
 
     .about-left {
@@ -1401,290 +1394,382 @@
     .about-title-inside {
         position: relative;
         z-index: 10;
-        color: #ffffff; /* Testo bianco */
-        display: flex;
-        align-items: center;
+        color: #ffffff;
         margin: 0;
-        margin-top: 8%; /* Aumentato lo spazio sopra su desktop */
-    }
-
-    .script-a {
-        font-family: var(--font-script);
-        font-size: clamp(8rem, 14vw, 17rem);
-        font-weight: 400;
-        line-height: 0.8;
-        padding-right: 0;
-        margin-right: 0vw;
-        padding-bottom: 2vh;
-        z-index: 2;
-    }
-
-    .neulis-rest {
-        font-family: var(--font-sans);
-        font-size: clamp(3rem, 5vw, 6rem);
-        text-transform: lowercase;
-        font-weight: 400;
-        line-height: 0.9;
-        padding-left: 4vh;
-        padding-top: 10vh;
+        margin-top: 8%;
+        margin-left: 32%;
+        text-align: left;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(1.6rem, 2.6vw, 2.6rem);
+        line-height: 1.1;
     }
 
     .about-right {
-        color: #000000;
+        color: var(--color-white);
         padding-right: var(--size-8);
         display: flex;
         flex-direction: column;
-        gap: var(--size-8);
+        gap: var(--size-6);
         position: relative;
         z-index: 10;
     }
 
-    .description p {
+    .about-intro {
+        font-family: var(--font-body);
         font-size: clamp(1.1rem, 1.8vw, 1.5rem);
         line-height: 1.5;
         margin: 0;
-        font-weight: 400;
+        font-weight: 500;
     }
 
-    .description .right-align {
-        text-align: right;
-        padding-left: 10%;
+    .about-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--size-5);
     }
 
-    /* --- NUOVI STILI COLLABORAZIONI SCROLL VERTICALE --- */
-    .collaborations {
-        padding-top: 4vh;
-        padding-bottom: var(--size-12);
-    }
-
-    .collab-header {
-        margin-bottom: var(--size-8);
-    }
-
-    .collab-title {
-        display: flex;
-        align-items: baseline;
-        color: var(--color-brand);
-        margin: 0;
-        line-height: 0.8;
-    }
-
-    .letter-collab {
-        font-family: var(--font-script);
-        font-size: clamp(6rem, 12vw, 15rem);
-        font-weight: 400;
-        padding-right: 0;
-        margin-right: -0.5vw;
-    }
-
-    .word-rest-collab {
-        font-family: var(--font-sans);
-        font-size: clamp(2.5rem, 5vw, 6rem);
-        font-weight: 400;
-        text-transform: lowercase;
-    }
-
-    .collab-vertical-list {
+    .feature {
+        background: var(--color-white);
+        color: var(--color-black);
+        border-radius: 18px;
+        padding: var(--size-5);
         display: flex;
         flex-direction: column;
-        gap: var(--size-12);
+        gap: 0.6rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
 
-    .project-slide {
+    .feature-icon {
+        font-size: 2rem;
+        line-height: 1;
+    }
+
+    .feature h3 {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        color: var(--color-brand);
+    }
+
+    .feature p {
+        font-family: var(--font-body);
+        font-size: 0.92rem;
+        line-height: 1.5;
+        margin: 0;
+        color: #333333;
+    }
+
+    .about-photos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--size-4);
+        margin-top: var(--size-2);
+    }
+
+    .about-photo {
+        aspect-ratio: 4 / 5;
+        width: 100%;
+        border-radius: 16px;
+        object-fit: cover;
+        object-position: 42% 22%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .photo-placeholder {
+        aspect-ratio: 4 / 5;
+        border: 2px dashed rgba(255, 255, 255, 0.5);
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        gap: 5vw;
-        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+        padding: var(--size-4);
+        color: rgba(255, 255, 255, 0.75);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        background: rgba(255, 255, 255, 0.05);
     }
 
-    .phones-group {
-        display: flex;
-        gap: 2vw;
-        position: relative;
-        flex-wrap: wrap;
-    }
-
-    .collab-main-star {
-        width: clamp(50px, 8vw, 90px);
-        height: clamp(50px, 8vw, 90px);
-        margin-left: 1.5vw;
-        margin-top: 3.5vh;
-        align-self: center;
-    }
-
-    /* CSS per replicare un telefono REALISTICO */
-    .phone-mockup {
-        width: clamp(200px, 22vw, 300px);
-        aspect-ratio: 9 / 19.5;
-        border-radius: 36px;
-        position: relative;
-        background: #000;
-        padding: 6px;
-        box-shadow:
-            0 0 0 2px #d1d1d1,
-            0 0 0 4px #a3a3a3,
-            10px 20px 40px rgba(0, 0, 0, 0.15);
-        flex-shrink: 0;
-        cursor: pointer;
-        transform-origin: center center;
-    }
-
-    /* Schermo interno */
-    .phone-screen {
-        width: 100%;
-        height: 100%;
-        background-color: #f4f4f4;
-        border-radius: 30px;
+    /* --- SOCIAL PROOF --- */
+    .social-proof {
+        padding-block: var(--size-8);
         overflow: hidden;
-        position: relative;
-        transform: translateZ(
-            0
-        ); /* Fix per il clipping del video con bordi arrotondati */
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     }
 
-    .mockup-video {
+    .social-proof-label {
+        text-align: center;
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(0, 0, 0, 0.45);
+        margin-bottom: var(--size-6);
+    }
+
+    .marquee-track-wrap {
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(
+            90deg,
+            transparent,
+            black 10%,
+            black 90%,
+            transparent
+        );
+        mask-image: linear-gradient(
+            90deg,
+            transparent,
+            black 10%,
+            black 90%,
+            transparent
+        );
+    }
+
+    .marquee-track {
+        display: flex;
+        gap: clamp(2.5rem, 6vw, 5rem);
+        width: max-content;
+        animation: marquee-scroll 22s linear infinite;
+    }
+
+    .brand-pill {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: clamp(1.3rem, 2.6vw, 2.2rem);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        color: rgba(0, 0, 0, 0.28);
+        white-space: nowrap;
+    }
+
+    @keyframes marquee-scroll {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-track {
+            animation: none;
+        }
+    }
+
+    /* --- PORTFOLIO --- */
+    .portfolio-section {
+        padding-block: var(--size-10);
+    }
+
+    .portfolio-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: var(--size-6);
+    }
+
+    .section-title-portfolio {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        color: var(--color-brand);
+        line-height: 0.95;
+        margin: 0;
+    }
+
+    .portfolio-subtitle {
+        font-family: var(--font-body);
+        color: rgba(0, 0, 0, 0.6);
+        font-size: clamp(1rem, 1.3vw, 1.2rem);
+        margin: 0;
+    }
+
+    .portfolio-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: var(--size-7);
+    }
+
+    .filter-chip {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.6rem 1.3rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        background: transparent;
+        color: var(--color-text);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-chip:hover {
+        border-color: var(--color-brand);
+        color: var(--color-brand);
+    }
+
+    .filter-chip.active {
+        background: var(--color-brand);
+        border-color: var(--color-brand);
+        color: var(--color-white);
+    }
+
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--size-6);
+    }
+
+    .portfolio-card {
+        position: relative;
+        aspect-ratio: 9 / 16;
+        border-radius: 20px;
+        overflow: hidden;
+        cursor: pointer;
+        background: #111111;
+    }
+
+    .portfolio-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        pointer-events: none; /* Impedisce al click di finire sul video stesso */
     }
 
-    .play-overlay {
+    .portfolio-caption {
         position: absolute;
-        top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.4);
+        right: 0;
+        bottom: 0;
+        padding: var(--size-4);
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.75), transparent);
         display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 5;
-        opacity: 0;
-        transition: opacity 0.3s ease;
+        flex-direction: column;
+        gap: 0.15rem;
+        color: #ffffff;
         pointer-events: none;
     }
 
-    .phone-mockup:hover .play-overlay:not(.is-playing) {
-        opacity: 1;
-    }
-
-    .play-overlay.is-playing {
-        opacity: 0 !important;
-    }
-
-    /* La Notch stile Dynamic Island arrotondata */
-    .phone-notch {
-        position: absolute;
-        top: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 30%;
-        height: 22px;
-        background: #000;
-        border-radius: 20px;
-        z-index: 10;
-    }
-
-    /* Pulsanti laterali del telefono usando CSS */
-    .phone-mockup::before {
-        content: "";
-        position: absolute;
-        top: 100px;
-        left: -4px;
-        width: 4px;
-        height: 45px;
-        background: #a3a3a3;
-        border-radius: 4px 0 0 4px;
-    }
-    .phone-mockup::after {
-        content: "";
-        position: absolute;
-        top: 130px;
-        right: -4px;
-        width: 4px;
-        height: 60px;
-        background: #a3a3a3;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .project-info {
-        max-width: 400px;
-        font-family: var(--font-sans);
-        color: var(--color-text);
-        flex: 1 1 300px;
-    }
-
-    .project-info h3 {
-        font-size: clamp(1.2rem, 2vw, 1.8rem);
-        margin-bottom: 1rem;
+    .portfolio-client {
+        font-family: var(--font-display);
         font-weight: 700;
-        display: inline-block;
-        transition:
-            transform 0.3s ease,
-            color 0.3s ease;
+        font-size: 1rem;
     }
 
-    .project-info h3:hover {
-        transform: translateX(5px);
-        color: var(--color-brand);
+    .portfolio-category {
+        font-family: var(--font-body);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        opacity: 0.75;
     }
 
-    .project-info ul {
-        list-style: none;
-        padding: 0;
+    .portfolio-metric {
+        position: absolute;
+        top: var(--size-3);
+        right: var(--size-3);
+        background: var(--color-brand);
+        color: #ffffff;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+    }
+
+    .portfolio-empty {
+        padding-block: var(--size-9);
+        text-align: center;
+        font-family: var(--font-body);
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.1rem;
+        border: 1px dashed rgba(0, 0, 0, 0.2);
+        border-radius: 20px;
+    }
+
+    /* --- ARTIST SECTION --- */
+    .artist-section {
+        background: var(--color-black);
+        color: var(--color-white);
+        padding-block: var(--size-10);
+        overflow: hidden;
+    }
+
+    .artist-inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--size-9);
+        align-items: center;
+    }
+
+    .artist-copy {
         display: flex;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: var(--size-5);
     }
 
-    .project-info li {
+    .section-title-artist {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+        line-height: 1.05;
+        margin: 0;
+    }
+
+    .artist-copy p {
+        font-family: var(--font-body);
+        font-size: clamp(1rem, 1.3vw, 1.2rem);
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 48ch;
+        margin: 0;
+    }
+
+    .artist-visual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--size-4);
+    }
+
+    .artist-panel {
         position: relative;
-        padding-left: 1.5rem;
-        line-height: 1.4;
-        font-size: clamp(1rem, 1.2vw, 1.2rem);
-        transition:
-            transform 0.3s ease,
-            color 0.3s ease;
-        cursor: default;
+        aspect-ratio: 3 / 4;
+        border-radius: 20px;
+        overflow: hidden;
     }
 
-    .project-info li:hover {
-        transform: translateX(8px);
-        color: var(--color-brand);
+    .artist-panel-art {
+        border: 2px dashed rgba(255, 255, 255, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: var(--size-4);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.04);
     }
 
-    .project-info li::before {
-        content: "•";
-        position: absolute;
-        left: 0;
-        color: var(--color-brand);
-        font-size: 1.5em;
-        line-height: 0.8;
+    .artist-panel-video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     /* --- REASONS STYLES --- */
     .section-title-reasons {
-        font-size: clamp(2rem, 4vw, 4.5rem);
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(2.2rem, 4.5vw, 4.5rem);
         color: var(--color-white);
         margin-bottom: var(--size-6);
-        display: flex;
-        align-items: baseline;
-        gap: 0.5rem;
-        font-family: var(--font-sans);
-        font-weight: 400;
-    }
-
-    .letter-script-reasons {
-        font-size: clamp(4rem, 7vw, 7.5rem);
-        line-height: 0.5;
-        padding-right: 0.2rem;
-    }
-
-    .question-mark {
-        font-size: clamp(3rem, 6vw, 6.5rem);
-        line-height: 0.5;
-        padding-left: 0.5rem;
     }
 
     .reasons-container {
@@ -1775,27 +1860,16 @@
     .insights {
         background: var(--color-white);
         color: var(--color-text);
-        padding-top: var(--size-8); /* Ridotto leggermente */
-        padding-bottom: var(--size-8); /* Ridotto */
+        padding-top: var(--size-8);
+        padding-bottom: var(--size-8);
     }
 
     .insights-title {
+        font-family: var(--font-display);
+        font-weight: 800;
         color: var(--color-brand);
-        display: flex;
-        align-items: baseline;
         margin-bottom: var(--size-10);
-        font-family: var(--font-sans);
-        font-weight: 400;
-    }
-
-    .letter-script-insights {
-        font-size: clamp(5rem, 8vw, 8.5rem);
-        line-height: 0.5;
-    }
-
-    .word-rest-insights {
-        font-size: clamp(2.5rem, 4vw, 4.5rem);
-        line-height: 0.8;
+        font-size: clamp(2.4rem, 5vw, 4.5rem);
     }
 
     .insights-grid {
@@ -1893,76 +1967,82 @@
             position: absolute;
             font-family: var(--font-sans);
             font-weight: 600;
-
-            /* Aumentato: minimo 1.8rem (circa 28px) e massimo 4.5rem (circa 72px) */
             font-size: clamp(1.8rem, 5vw, 4.5rem);
-
             color: var(--color-white, #ffffff);
             text-align: center;
             opacity: 0;
             padding: var(--size-4);
             max-width: 95vw;
             width: 100%;
-            letter-spacing: -0.02em; /* Un valore leggermente più negativo rende il testo grande più compatto ed elegante */
+            letter-spacing: -0.02em;
         }
+
         .hero {
-            margin-bottom: -8vh;
+            min-height: 88vh;
+            align-items: flex-end;
         }
-        .title-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+
+        .hero-video-bg {
+            -webkit-mask-image: linear-gradient(
+                to top,
+                transparent 0%,
+                transparent 40%,
+                black 100%
+            );
+            mask-image: linear-gradient(
+                to top,
+                transparent 0%,
+                transparent 40%,
+                black 100%
+            );
         }
-        .hero h1 {
-            margin-left: 0;
-            padding-top: 10vh;
-            align-items: center;
+
+        .hero-photo-wrap {
+            right: -8%;
+            height: 55%;
+            opacity: 0.3;
+            z-index: 0;
         }
-        .word-creator {
-            margin-left: 0;
-            margin-top: 0;
+
+        .hero-content {
+            padding-block: 2.5rem 3rem;
+            gap: var(--size-4);
+            z-index: 2;
         }
-        .letter-script {
-            font-size: clamp(6rem, 30vw, 10rem);
+
+        .hero-script-letter {
+            font-size: clamp(3.2rem, 20vw, 5rem);
         }
-        .word-rest {
-            font-size: clamp(2.5rem, 15vw, 5rem);
+
+        .hero-name-rest {
+            font-size: clamp(1.3rem, 8vw, 2rem);
         }
+
+        .hero-role {
+            font-size: clamp(1rem, 5vw, 1.3rem);
+        }
+
         .hero-tags {
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 8vh;
-            font-size: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.6rem 1rem;
         }
+
         .hero-tags .dash {
             display: none;
         }
-        .star {
-            position: relative;
-            top: auto;
-            left: auto;
-            right: auto;
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 4rem;
-            z-index: 10;
-            width: 120px;
-            height: 120px;
+
+        .hero-subcopy {
+            font-size: 0.95rem;
+            max-width: 100%;
         }
-        .hero-image-wrapper {
-            right: -5%;
-            bottom: -5vh;
-            height: 85vh;
-            z-index: 0;
+
+        .hero-cta-row {
+            flex-direction: column;
+            align-items: stretch;
         }
-        .hero-image {
-            opacity: 0.4 !important;
-        }
-        .hero-content {
-            z-index: 5;
-            margin-top: -15vh;
+
+        .btn {
+            width: 100%;
         }
 
         .marquee {
@@ -2002,144 +2082,54 @@
             top: +50%;
         }
         .about-title-inside {
-            margin-top: -13vh; /* Meno negativo = più spazio sopra su mobile */
+            margin-top: -6vh;
+            margin-left: 0;
             justify-content: center;
             align-items: center;
-        }
-        .script-a {
-            font-size: clamp(6rem, 25vw, 10rem);
-            padding-bottom: 0;
-        }
-        .neulis-rest {
-            padding-top: 2vh;
-            font-size: 1.6rem;
+            text-align: center;
+            font-size: clamp(1.8rem, 8vw, 2.6rem);
         }
 
         .about-right {
-            margin-top: -13vh;
+            margin-top: var(--size-6);
             padding-inline: 0rem;
+            padding-right: 0;
             z-index: 10;
-            gap: 1rem; /* Aumenta lo spazio tra i paragrafi */
+            gap: var(--size-5);
         }
-        .description p {
-            font-size: 0.7rem;
+        .about-intro {
+            font-size: 1rem;
             text-align: center;
-            line-height: 1.6;
         }
-        .description .right-align {
-            text-align: center;
-            padding-left: 0;
-        }
-        .neulis-rest br {
-            display: inline;
-            content: " ";
+        .about-features {
+            grid-template-columns: 1fr;
         }
 
-        /* === Collaborazioni: Telefoni separati e proporzionati === */
-        .letter-collab {
-            font-size: clamp(
-                4rem,
-                15vw,
-                6rem
-            ); /* Rimpicciolisce la "C" corsiva */
+        .social-proof-label {
+            margin-bottom: var(--size-4);
+        }
+        .brand-pill {
+            font-size: 1.4rem;
         }
 
-        .word-rest-collab {
-            font-size: clamp(
-                1.5rem,
-                7vw,
-                2.5rem
-            ); /* Rimpicciolisce "ollaborazioni" per farlo stare nello schermo */
+        .portfolio-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
         }
-        .project-slide {
-            display: grid;
+        .portfolio-filters {
+            gap: 0.5rem;
+        }
+        .filter-chip {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .artist-inner {
+            grid-template-columns: 1fr;
+            gap: var(--size-6);
+        }
+        .artist-visual {
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-
-        .phones-group {
-            display: contents; /* Make phones direct children of grid */
-        }
-
-        .phone-mockup {
-            width: 100%;
-            max-width: 160px; /* Un po' più grande per riempire la colonna */
-            justify-self: center; /* Centra nella colonna */
-            margin-left: 0;
-            flex-shrink: 0;
-            z-index: 1;
-            /* Proporzioni corrette per sembrare veri iPhone */
-            border-radius: 18px;
-            padding: 4px;
-            box-shadow:
-                0 0 0 1px #d1d1d1,
-                0 0 0 3px #a3a3a3,
-                5px 10px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .phone-screen {
-            border-radius: 14px; /* Adattato al nuovo bordo */
-        }
-
-        .phone-notch {
-            top: 8px;
-            height: 12px;
-            border-radius: 10px;
-        }
-
-        .collaborations {
-            padding-bottom: 2rem;
-        }
-
-        /* Pulsanti laterali del telefono usando CSS */
-        .phone-mockup::before {
-            content: "";
-            position: absolute;
-            top: 40px;
-            left: -2px;
-            width: 2px;
-            height: 20px;
-            background: #a3a3a3;
-            border-radius: 4px 0 0 4px;
-        }
-        .phone-mockup::after {
-            content: "";
-            position: absolute;
-            top: 55px;
-            right: -2px;
-            width: 2px;
-            height: 35px;
-            background: #a3a3a3;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .collab-main-star {
-            display: none;
-        }
-
-        .project-info h3 {
-            padding-top: 2rem;
-            font-size: 0.95rem; /* Rimpicciolito il titolo LENOVO */
-            margin-bottom: 0.3rem; /* Avvicinato alla lista */
-        }
-
-        .project-info ul {
-            align-items: flex-start;
-            text-align: left;
-            /* AGGIUNGI QUESTA RIGA: annulla lo spazio gigante tra un punto e l'altro */
-            gap: 0.4rem;
-        }
-
-        .project-info li {
-            font-size: 0.6rem; /* Rimpicciolito il testo dei punti elenco */
-            padding-left: 0.8rem; /* Avvicinato il pallino al testo */
-            margin-bottom: 0;
-            line-height: 1.2; /* Compatta le righe quando un punto va a capo */
-        }
-
-        .collab-vertical-list {
-            gap: 4rem;
         }
 
         /* Insights Tweak */
@@ -2155,21 +2145,9 @@
             margin-top: 0;
         }
 
-        /* === Rimpicciolisce il titolo "Social Insights" su Mobile === */
-        .letter-script-insights {
-            font-size: clamp(
-                5rem,
-                12vw,
-                8rem
-            ); /* Rimpicciolisce la S e la I maiuscole */
-        }
-
-        .word-rest-insights {
-            font-size: clamp(
-                1.5rem,
-                6vw,
-                2rem
-            ); /* Rimpicciolisce "ocial" e "nsights" */
+        .insights-title {
+            font-size: clamp(2rem, 10vw, 3rem);
+            margin-bottom: 2rem;
         }
 
         /* === Rimpicciolisce i numeri blu degli Insights su Mobile === */
@@ -2190,52 +2168,28 @@
 
         /* === Rimpicciolisce i titoli dei blocchi (Instagram... / TikTok...) === */
         .insight-block h3 {
-            font-size: 1.1rem; /* Riduce i titoli delle due sezioni */
-            margin-bottom: 1rem; /* Regola di conseguenza lo spazio sotto il titolo */
-        }
-
-        /* Sistema anche la label interna alla ciambella se serve */
-        .donut-label {
-            font-size: 0.75rem; /* Rimpicciolisce la scritta "Non-Follower" */
-        }
-
-        .label-city {
-            font-size: clamp(
-                1.4rem,
-                6vw,
-                1.8rem
-            ); /* Rimpicciolisce la parola "Milano" */
-        }
-
-        .text-small {
-            font-size: clamp(
-                1rem,
-                4vw,
-                1.2rem
-            ); /* Rimpicciolisce le percentuali tra parentesi (es. 7.5%) */
-        }
-
-        .donut-label .num-animate {
-            font-size: clamp(
-                1.2rem,
-                5vw,
-                1.5rem
-            ); /* Rimpicciolisce il numero nel grafico a ciambella */
-        }
-
-        /* === Riduce lo spazio sotto il titolo "Social Insights" === */
-        .insights-title {
-            margin-bottom: 2rem; /* Abbassa questo valore (es. 1.5rem) se lo vuoi ancora più vicino */
-        }
-
-        /* Opzionale: se vuoi ridurre anche lo spazio sotto "Instagram Analytics" prima dei dati */
-        .insight-block h3 {
+            font-size: 1.1rem;
             margin-bottom: 1.5rem;
         }
 
-        /* === Riduce lo spazio tra il blocco Instagram e TikTok === */
+        .donut-label {
+            font-size: 0.75rem;
+        }
+
+        .label-city {
+            font-size: clamp(1.4rem, 6vw, 1.8rem);
+        }
+
+        .text-small {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+        }
+
+        .donut-label .num-animate {
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+        }
+
         .insights-grid {
-            gap: 3rem; /* Cambia a 1.5rem se lo vuoi ancora più vicino */
+            gap: 3rem;
         }
     }
 
